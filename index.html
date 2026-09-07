@@ -9,35 +9,34 @@
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
 <style>
-
 * {
     box-sizing: border-box;
 }
 
 body {
     margin: 0;
-    font-family: Arial, Tahoma, sans-serif;
-    background: #f3f6fa;
+    background: #f4f7fb;
     color: #172033;
+    font-family: Arial, Tahoma, sans-serif;
 }
 
 .container {
     max-width: 1100px;
     margin: auto;
-    padding: 25px 15px 60px;
+    padding: 20px;
 }
 
 .header {
     background: #102a43;
     color: white;
-    border-radius: 18px;
     padding: 28px;
-    margin-bottom: 20px;
+    border-radius: 18px;
     text-align: center;
+    margin-bottom: 20px;
 }
 
 .header h1 {
-    margin: 0 0 10px;
+    margin: 0 0 8px;
     font-size: 28px;
 }
 
@@ -46,91 +45,87 @@ body {
     opacity: .85;
 }
 
-.upload-box {
+.box {
     background: white;
     border-radius: 18px;
-    padding: 25px;
-    box-shadow: 0 5px 25px rgba(0,0,0,.06);
+    padding: 22px;
     margin-bottom: 20px;
+    box-shadow: 0 5px 25px rgba(0,0,0,.06);
 }
 
-.upload-label {
+.upload {
     display: block;
-    border: 2px dashed #7b8794;
-    border-radius: 15px;
+    border: 2px dashed #718096;
     padding: 35px 20px;
     text-align: center;
+    border-radius: 15px;
     cursor: pointer;
-    transition: .2s;
 }
 
-.upload-label:hover {
-    border-color: #102a43;
+.upload:hover {
     background: #f8fafc;
 }
 
-.upload-label strong {
+.upload strong {
     display: block;
     font-size: 20px;
     margin-bottom: 8px;
 }
 
-#fileInput {
+#files {
     display: none;
 }
 
-.controls {
+.buttons {
     display: flex;
-    flex-wrap: wrap;
     gap: 10px;
+    flex-wrap: wrap;
     margin-top: 15px;
 }
 
 button {
-    border: 0;
+    border: none;
     border-radius: 10px;
     padding: 12px 18px;
-    cursor: pointer;
     font-size: 15px;
     font-weight: bold;
+    cursor: pointer;
 }
 
-.btn-main {
+button:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+}
+
+.primary {
     background: #102a43;
     color: white;
 }
 
-.btn-copy {
+.green {
     background: #2f855a;
     color: white;
 }
 
-.btn-danger {
+.red {
     background: #c53030;
     color: white;
 }
 
-.btn-gray {
+.gray {
     background: #e2e8f0;
     color: #172033;
 }
 
-button:disabled {
-    opacity: .5;
-    cursor: not-allowed;
-}
-
 .status {
-    margin-top: 15px;
     background: #edf2f7;
-    border-radius: 10px;
     padding: 12px;
-    min-height: 45px;
+    border-radius: 10px;
+    margin-top: 15px;
 }
 
 .progress {
-    width: 100%;
-    height: 12px;
+    height: 10px;
     background: #e2e8f0;
     border-radius: 20px;
     overflow: hidden;
@@ -144,44 +139,34 @@ button:disabled {
     transition: width .2s;
 }
 
-.results {
-    display: grid;
-    gap: 18px;
-}
-
 .card {
     background: white;
     border-radius: 18px;
     padding: 20px;
+    margin-bottom: 18px;
     box-shadow: 0 5px 25px rgba(0,0,0,.06);
 }
 
 .card h2 {
     margin-top: 0;
-    font-size: 21px;
 }
 
 .filename {
-    color: #52606d;
-    font-size: 14px;
+    color: #718096;
+    font-size: 13px;
     margin-bottom: 15px;
 }
 
-.result-status {
-    padding: 12px;
+.result {
+    padding: 13px;
     border-radius: 10px;
     margin-bottom: 15px;
     font-weight: bold;
 }
 
-.valid {
+.success {
     background: #c6f6d5;
     color: #22543d;
-}
-
-.invalid {
-    background: #fed7d7;
-    color: #742a2a;
 }
 
 .warning {
@@ -189,10 +174,15 @@ button:disabled {
     color: #744210;
 }
 
+.error {
+    background: #fed7d7;
+    color: #742a2a;
+}
+
 .fields {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    gap: 10px;
 }
 
 .field {
@@ -209,67 +199,41 @@ button:disabled {
     margin-bottom: 5px;
 }
 
-.field-value {
+.value {
     font-weight: bold;
     word-break: break-word;
 }
 
-.full-width {
+.full {
     grid-column: 1 / -1;
 }
 
-.mrz-box {
+.mrz {
     direction: ltr;
     text-align: left;
     background: #111827;
-    color: #fff;
+    color: white;
     padding: 15px;
     border-radius: 10px;
     font-family: monospace;
     font-size: 15px;
     line-height: 1.8;
     word-break: break-all;
-    margin-top: 10px;
+    margin-top: 8px;
 }
 
-.small-note {
-    color: #718096;
-    font-size: 13px;
-    line-height: 1.7;
-}
-
-.copy-row {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
+.checks {
     margin-top: 15px;
-}
-
-.preview {
-    max-width: 100%;
-    max-height: 250px;
-    display: block;
-    margin: 15px auto;
-    border-radius: 10px;
-    border: 1px solid #ddd;
-}
-
-.manual {
-    margin-top: 25px;
-    border-top: 1px solid #e2e8f0;
-    padding-top: 20px;
-}
-
-textarea {
-    width: 100%;
-    min-height: 110px;
     padding: 12px;
-    border: 1px solid #cbd5e0;
     border-radius: 10px;
-    resize: vertical;
-    font-family: monospace;
-    direction: ltr;
-    text-align: left;
+    background: #f7fafc;
+    line-height: 2;
+}
+
+.note {
+    font-size: 13px;
+    color: #718096;
+    line-height: 1.7;
 }
 
 @media(max-width:700px) {
@@ -277,11 +241,10 @@ textarea {
         grid-template-columns: 1fr;
     }
 
-    .header h1 {
-        font-size: 22px;
+    .full {
+        grid-column: auto;
     }
 }
-
 </style>
 </head>
 
@@ -294,228 +257,250 @@ textarea {
         <p>استخراج بيانات الجواز من منطقة MRZ</p>
     </div>
 
-    <div class="upload-box">
+    <div class="box">
 
-        <label class="upload-label" for="fileInput">
-            <strong>📷 اختر صور الجوازات</strong>
-            <span>تگدر تختار صورة واحدة أو عدة صور دفعة واحدة</span>
+        <label class="upload" for="files">
+            <strong>📷 اختيار صور الجوازات</strong>
+            <span>اختار صورة واحدة أو عدة صور دفعة واحدة</span>
         </label>
 
         <input
+            id="files"
             type="file"
-            id="fileInput"
             accept="image/*"
             multiple
         >
 
-        <div class="controls">
+        <div class="buttons">
 
             <button
-                class="btn-main"
-                id="processBtn"
+                id="start"
+                class="primary"
                 disabled
             >
-                بدء استخراج البيانات
+                بدء القراءة
             </button>
 
             <button
-                class="btn-copy"
-                id="copyAllBtn"
+                id="copyAll"
+                class="green"
                 disabled
             >
-                نسخ كل البيانات
+                نسخ الكل
             </button>
 
             <button
-                class="btn-danger"
-                id="clearBtn"
+                id="clear"
+                class="red"
             >
-                مسح الكل
+                مسح
             </button>
 
         </div>
 
-        <div class="status" id="status">
-            لم يتم اختيار أي صورة.
+        <div
+            id="status"
+            class="status"
+        >
+            لم يتم اختيار صور.
         </div>
 
         <div class="progress">
             <div
+                id="progress"
                 class="progress-bar"
-                id="progressBar"
             ></div>
         </div>
 
-        <p class="small-note">
-            المعالجة تتم داخل المتصفح قدر الإمكان، ولا يوجد كود هنا يقوم برفع صور الجوازات إلى سيرفر خاص بك.
+        <p class="note">
+            الصور تتم معالجتها داخل المتصفح. الموقع لا يحتوي على كود لإرسال صور الجوازات إلى سيرفر خاص بك.
         </p>
 
     </div>
 
-
-    <div class="results" id="results"></div>
-
-
-    <div class="card manual">
-
-        <h2>إدخال MRZ يدويًا</h2>
-
-        <p class="small-note">
-            إذا كانت الصورة غير واضحة، تگدر تلصق سطري MRZ هنا.
-            الموقع يفحص الطول وأرقام التحقق قبل اعتماد البيانات.
-        </p>
-
-        <textarea
-            id="manualMrz"
-            placeholder="P<IRQ...
-XXXXXXXXX0IRQ..."
-        ></textarea>
-
-        <div class="controls">
-
-            <button
-                class="btn-main"
-                id="manualBtn"
-            >
-                فحص MRZ
-            </button>
-
-        </div>
-
-    </div>
+    <div id="results"></div>
 
 </div>
 
 
 <script>
 
-const fileInput = document.getElementById("fileInput");
-const processBtn = document.getElementById("processBtn");
-const copyAllBtn = document.getElementById("copyAllBtn");
-const clearBtn = document.getElementById("clearBtn");
+const filesInput =
+    document.getElementById("files");
 
-const statusBox = document.getElementById("status");
-const progressBar = document.getElementById("progressBar");
-const resultsBox = document.getElementById("results");
+const startButton =
+    document.getElementById("start");
 
-const manualMrz = document.getElementById("manualMrz");
-const manualBtn = document.getElementById("manualBtn");
+const copyAllButton =
+    document.getElementById("copyAll");
 
-let selectedFiles = [];
-let extractedResults = [];
+const clearButton =
+    document.getElementById("clear");
+
+const statusBox =
+    document.getElementById("status");
+
+const progressBar =
+    document.getElementById("progress");
+
+const resultsBox =
+    document.getElementById("results");
 
 
-/* =========================
-   FILE SELECTION
-========================= */
+let files = [];
+let results = [];
 
-fileInput.addEventListener("change", function() {
 
-    selectedFiles = Array.from(this.files);
+/* =========================================
+   FILES
+========================================= */
 
-    if (!selectedFiles.length) {
+filesInput.addEventListener(
+    "change",
+    () => {
 
-        processBtn.disabled = true;
+        files =
+            Array.from(
+                filesInput.files
+            );
+
+        if (!files.length) {
+
+            startButton.disabled = true;
+
+            statusBox.textContent =
+                "لم يتم اختيار صور.";
+
+            return;
+        }
+
+        startButton.disabled = false;
 
         statusBox.textContent =
-            "لم يتم اختيار أي صورة.";
+            `تم اختيار ${files.length} جواز.`;
 
-        return;
     }
-
-    processBtn.disabled = false;
-
-    statusBox.textContent =
-        `تم اختيار ${selectedFiles.length} صورة. اضغط بدء استخراج البيانات.`;
-
-});
+);
 
 
-/* =========================
+/* =========================================
    STATUS
-========================= */
+========================================= */
 
-function setStatus(text, percent = null) {
+function status(
+    text,
+    percent = null
+) {
 
     statusBox.textContent = text;
 
     if (percent !== null) {
-        progressBar.style.width = percent + "%";
+
+        progressBar.style.width =
+            percent + "%";
+
     }
 
 }
 
 
-/* =========================
-   CREATE IMAGE
-========================= */
+/* =========================================
+   LOAD IMAGE
+========================================= */
 
 function loadImage(file) {
 
-    return new Promise((resolve, reject) => {
+    return new Promise(
+        (resolve, reject) => {
 
-        const img = new Image();
+            const img =
+                new Image();
 
-        img.onload = () => resolve(img);
+            img.onload = () => {
 
-        img.onerror = reject;
+                URL.revokeObjectURL(
+                    img.src
+                );
 
-        img.src = URL.createObjectURL(file);
+                resolve(img);
 
-    });
+            };
+
+            img.onerror =
+                reject;
+
+            img.src =
+                URL.createObjectURL(
+                    file
+                );
+
+        }
+    );
 
 }
 
 
-/* =========================
-   CROP MRZ AREA
-========================= */
+/* =========================================
+   CROP
+========================================= */
 
-function createMRZCanvas(img, mode = 0) {
+function cropBottom(
+    img,
+    startPercent
+) {
 
-    const canvas = document.createElement("canvas");
+    const canvas =
+        document.createElement(
+            "canvas"
+        );
 
-    const ctx = canvas.getContext("2d");
+    const width =
+        img.naturalWidth;
 
-    const width = img.naturalWidth;
-    const height = img.naturalHeight;
+    const height =
+        img.naturalHeight;
+
+    const start =
+        Math.floor(
+            height *
+            startPercent
+        );
+
+    const cropHeight =
+        height - start;
 
     /*
-        Most passports have MRZ near bottom.
-
-        We use several crop sizes because
-        passport images can have different framing.
+        Increase resolution.
     */
 
-    let cropStart;
+    const scale =
+        Math.min(
+            4,
+            3000 / width
+        );
 
-    if (mode === 0) {
-        cropStart = Math.floor(height * 0.60);
-    }
+    canvas.width =
+        Math.floor(
+            width * scale
+        );
 
-    else if (mode === 1) {
-        cropStart = Math.floor(height * 0.52);
-    }
+    canvas.height =
+        Math.floor(
+            cropHeight * scale
+        );
 
-    else {
-        cropStart = Math.floor(height * 0.68);
-    }
+    const ctx =
+        canvas.getContext("2d");
 
-    const cropHeight = height - cropStart;
+    ctx.imageSmoothingEnabled = true;
 
-    const scale = Math.min(
-        3,
-        2200 / width
-    );
-
-    canvas.width = Math.floor(width * scale);
-
-    canvas.height = Math.floor(cropHeight * scale);
+    ctx.imageSmoothingQuality =
+        "high";
 
     ctx.drawImage(
         img,
         0,
-        cropStart,
+        start,
         width,
         cropHeight,
         0,
@@ -528,96 +513,107 @@ function createMRZCanvas(img, mode = 0) {
 }
 
 
-/* =========================
-   IMAGE PREPROCESSING
-========================= */
+/* =========================================
+   GRAYSCALE
+========================================= */
 
-function preprocessCanvas(sourceCanvas, mode = 0) {
+function processImage(
+    source,
+    mode
+) {
 
-    const canvas = document.createElement("canvas");
+    const canvas =
+        document.createElement(
+            "canvas"
+        );
 
-    canvas.width = sourceCanvas.width;
+    canvas.width =
+        source.width;
 
-    canvas.height = sourceCanvas.height;
+    canvas.height =
+        source.height;
 
-    const ctx = canvas.getContext("2d");
+    const ctx =
+        canvas.getContext("2d");
 
-    ctx.drawImage(sourceCanvas, 0, 0);
-
-    const imageData = ctx.getImageData(
+    ctx.drawImage(
+        source,
         0,
-        0,
-        canvas.width,
-        canvas.height
+        0
     );
 
-    const data = imageData.data;
+    const image =
+        ctx.getImageData(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
 
-    for (let i = 0; i < data.length; i += 4) {
+    const data =
+        image.data;
 
-        let r = data[i];
-        let g = data[i + 1];
-        let b = data[i + 2];
-
-        /*
-            Grayscale
-        */
+    for (
+        let i = 0;
+        i < data.length;
+        i += 4
+    ) {
 
         let gray =
-            (0.299 * r) +
-            (0.587 * g) +
-            (0.114 * b);
+            (
+                data[i] * 0.299 +
+                data[i + 1] * 0.587 +
+                data[i + 2] * 0.114
+            );
 
         /*
-            Contrast
+            Contrast.
         */
 
         gray =
-            ((gray - 128) * 1.7) + 128;
-
-        /*
-            Threshold modes
-        */
+            ((gray - 128) * 1.8)
+            + 128;
 
         if (mode === 1) {
 
             gray =
                 gray > 145
-                ? 255
-                : 0;
+                    ? 255
+                    : 0;
 
         }
 
-        else if (mode === 2) {
+        if (mode === 2) {
 
             gray =
-                gray > 170
-                ? 255
-                : 0;
+                gray > 175
+                    ? 255
+                    : 0;
 
         }
 
-        else {
+        gray =
+            Math.max(
+                0,
+                Math.min(
+                    255,
+                    gray
+                )
+            );
 
-            gray =
-                Math.max(
-                    0,
-                    Math.min(
-                        255,
-                        gray
-                    )
-                );
+        data[i] =
+            gray;
 
-        }
+        data[i + 1] =
+            gray;
 
-        data[i] = gray;
-        data[i + 1] = gray;
-        data[i + 2] = gray;
+        data[i + 2] =
+            gray;
 
     }
 
     ctx.putImageData(
-        imageData,
+        image,
         0,
         0
     );
@@ -626,31 +622,38 @@ function preprocessCanvas(sourceCanvas, mode = 0) {
 }
 
 
-/* =========================
+/* =========================================
    OCR
-========================= */
+========================================= */
 
-async function runOCR(canvas) {
+async function OCR(
+    canvas,
+    psm
+) {
 
     const result =
         await Tesseract.recognize(
             canvas,
             "eng",
             {
-                logger: message => {
+
+                logger: m => {
 
                     if (
-                        message.status ===
+                        m.status ===
                         "recognizing text"
                     ) {
 
                         const p =
                             Math.round(
-                                message.progress * 100
+                                m.progress *
+                                100
                             );
 
-                        setStatus(
-                            "قراءة منطقة MRZ: " + p + "%",
+                        status(
+                            "قراءة MRZ: " +
+                            p +
+                            "%",
                             p
                         );
 
@@ -661,62 +664,289 @@ async function runOCR(canvas) {
                 tessedit_char_whitelist:
                     "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<",
 
-                preserve_interword_spaces: "0",
+                tessedit_pageseg_mode:
+                    String(psm)
 
-                tessedit_pageseg_mode: "6"
             }
         );
 
-    return result.data.text || "";
-
+    return result.data;
 }
 
 
-/* =========================
-   NORMALIZE OCR
-========================= */
+/* =========================================
+   NORMALIZE
+========================================= */
 
-function normalizeOCR(text) {
+function normalizeLine(
+    line
+) {
 
-    let value = text
+    return line
         .toUpperCase()
-        .replace(/[«»]/g, "<")
-        .replace(/[‹›]/g, "<")
-        .replace(/[|]/g, "I")
-        .replace(/[—–_]/g, "-");
+        .replace(/«/g, "<")
+        .replace(/»/g, "<")
+        .replace(/‹/g, "<")
+        .replace(/›/g, "<")
+        .replace(/ /g, "")
+        .replace(/[^A-Z0-9<]/g, "");
 
-    /*
-        Common OCR confusion
-    */
-
-    value = value
-        .replace(/O(?=\d)/g, "0")
-        .replace(/(?<=\d)O/g, "0");
-
-    /*
-        Keep MRZ characters only
-    */
-
-    value = value.replace(
-        /[^A-Z0-9<\r\n]/g,
-        ""
-    );
-
-    return value;
 }
 
 
-/* =========================
+/* =========================================
+   IMPORTANT:
+   PRESERVE OCR LINES
+========================================= */
+
+function getOCRLines(
+    text
+) {
+
+    if (!text) {
+        return [];
+    }
+
+    return text
+        .split(/\r?\n/)
+        .map(normalizeLine)
+        .filter(
+            line =>
+                line.length >= 20
+        );
+
+}
+
+
+/* =========================================
+   OCR WORDS / LINES
+========================================= */
+
+function collectOCRLines(
+    data
+) {
+
+    let output = [];
+
+    /*
+        Tesseract lines.
+    */
+
+    if (
+        data &&
+        Array.isArray(
+            data.lines
+        )
+    ) {
+
+        for (
+            const line
+            of data.lines
+        ) {
+
+            const value =
+                normalizeLine(
+                    line.text
+                );
+
+            if (
+                value.length >= 20
+            ) {
+
+                output.push(value);
+
+            }
+
+        }
+
+    }
+
+    /*
+        Fallback text.
+    */
+
+    if (
+        data &&
+        data.text
+    ) {
+
+        output.push(
+            ...getOCRLines(
+                data.text
+            )
+        );
+
+    }
+
+    return [
+        ...new Set(output)
+    ];
+
+}
+
+
+/* =========================================
+   MRZ CHARACTER RULE
+========================================= */
+
+function validMRZChars(
+    value
+) {
+
+    return /^[A-Z0-9<]+$/
+        .test(value);
+
+}
+
+
+/* =========================================
+   LINE 1 SCORE
+========================================= */
+
+function scoreLine1(
+    line
+) {
+
+    let score = 0;
+
+    if (
+        line.length === 44
+    ) {
+        score += 50;
+    }
+
+    if (
+        line.startsWith("P<")
+    ) {
+        score += 100;
+    }
+
+    if (
+        /^P[A-Z<][A-Z]{3}/
+            .test(line)
+    ) {
+        score += 50;
+    }
+
+    /*
+        Issuing country.
+    */
+
+    if (
+        /^[A-Z<]{5}/
+            .test(line)
+    ) {
+        score += 10;
+    }
+
+    /*
+        Names normally contain <<
+    */
+
+    if (
+        line.includes("<<")
+    ) {
+        score += 40;
+    }
+
+    return score;
+}
+
+
+/* =========================================
+   LINE 2 SCORE
+========================================= */
+
+function scoreLine2(
+    line
+) {
+
+    let score = 0;
+
+    if (
+        line.length === 44
+    ) {
+        score += 50;
+    }
+
+    /*
+        Position 10 should
+        normally be a digit.
+    */
+
+    if (
+        /^\w{9}\d/
+            .test(line)
+    ) {
+        score += 30;
+    }
+
+    /*
+        Nationality.
+    */
+
+    if (
+        /^[A-Z0-9<]{10}[A-Z]{3}/
+            .test(line)
+    ) {
+        score += 30;
+    }
+
+    /*
+        DOB.
+    */
+
+    if (
+        /^.{13}\d{6}\d/
+            .test(line)
+    ) {
+        score += 30;
+    }
+
+    /*
+        Sex.
+    */
+
+    if (
+        /^.{20}[MF<]/
+            .test(line)
+    ) {
+        score += 30;
+    }
+
+    /*
+        Expiry.
+    */
+
+    if (
+        /^.{21}\d{6}\d/
+            .test(line)
+    ) {
+        score += 30;
+    }
+
+    return score;
+}
+
+
+/* =========================================
    CHECK DIGIT
-========================= */
+========================================= */
 
-function mrzValue(char) {
+function valueOf(
+    char
+) {
 
-    if (char === "<") {
+    if (
+        char === "<"
+    ) {
         return 0;
     }
 
-    if (char >= "0" && char <= "9") {
+    if (
+        char >= "0" &&
+        char <= "9"
+    ) {
         return Number(char);
     }
 
@@ -736,392 +966,277 @@ function mrzValue(char) {
 }
 
 
-function calculateCheckDigit(value) {
+function checkDigit(
+    value
+) {
 
-    const weights = [7, 3, 1];
+    const weights =
+        [7, 3, 1];
 
     let total = 0;
 
-    for (let i = 0; i < value.length; i++) {
+    for (
+        let i = 0;
+        i < value.length;
+        i++
+    ) {
 
         total +=
-            mrzValue(value[i]) *
-            weights[i % 3];
+            valueOf(
+                value[i]
+            ) *
+            weights[
+                i % 3
+            ];
 
     }
 
-    return String(total % 10);
-
+    return String(
+        total % 10
+    );
 }
 
 
-function checkField(
+function validCheck(
     value,
-    checkDigit
+    digit
 ) {
 
-    if (!/^\d$/.test(checkDigit)) {
-        return false;
-    }
-
     return (
-        calculateCheckDigit(value) ===
-        checkDigit
+        /^\d$/.test(digit) &&
+        checkDigit(value) === digit
     );
 
 }
 
 
-/* =========================
-   VALIDATE TD3
-========================= */
+/* =========================================
+   VALIDATE
+========================================= */
 
-function validateTD3(
-    line1,
-    line2
+function validate(
+    a,
+    b
 ) {
 
-    const checks = {
+    if (
+        a.length !== 44 ||
+        b.length !== 44
+    ) {
 
-        passport:
-            checkField(
-                line2.substring(0, 9),
-                line2.charAt(9)
-            ),
+        return {
+            valid: false,
+            score: 0,
+            checks: {}
+        };
 
-        birth:
-            checkField(
-                line2.substring(13, 19),
-                line2.charAt(19)
-            ),
+    }
 
-        expiry:
-            checkField(
-                line2.substring(21, 27),
-                line2.charAt(27)
-            ),
+    const passport =
+        validCheck(
+            b.substring(0, 9),
+            b[9]
+        );
 
-        personal:
-            checkField(
-                line2.substring(28, 42),
-                line2.charAt(42)
-            ),
+    const birth =
+        validCheck(
+            b.substring(13, 19),
+            b[19]
+        );
 
-        composite:
-            checkField(
-                line2.substring(0, 10) +
-                line2.substring(13, 20) +
-                line2.substring(21, 43),
-                line2.charAt(43)
-            )
+    const expiry =
+        validCheck(
+            b.substring(21, 27),
+            b[27]
+        );
 
-    };
+    const personal =
+        validCheck(
+            b.substring(28, 42),
+            b[42]
+        );
 
-    const passed =
-        Object.values(checks)
-            .filter(Boolean)
-            .length;
+    const composite =
+        validCheck(
+            b.substring(0, 10) +
+            b.substring(13, 20) +
+            b.substring(21, 43),
+            b[43]
+        );
+
+    let score = 0;
+
+    if (passport)
+        score += 30;
+
+    if (birth)
+        score += 25;
+
+    if (expiry)
+        score += 25;
+
+    if (personal)
+        score += 10;
+
+    if (composite)
+        score += 40;
+
+    /*
+        We require the important
+        fields to validate.
+
+        Do NOT accept random OCR.
+    */
+
+    const valid =
+        passport &&
+        birth &&
+        expiry &&
+        composite;
 
     return {
-        checks,
-        passed,
-        valid:
-            passed >= 4 &&
-            line1.length === 44 &&
-            line2.length === 44
+
+        valid,
+
+        score,
+
+        checks: {
+            passport,
+            birth,
+            expiry,
+            personal,
+            composite
+        }
+
     };
 
 }
 
 
-/* =========================
-   FORMAT MRZ
-========================= */
+/* =========================================
+   CORRECT COMMON OCR ERRORS
+========================================= */
 
-function cleanMRZLine(line) {
+function correctLine2(
+    line
+) {
 
-    return line
-        .toUpperCase()
-        .replace(
-            /[^A-Z0-9<]/g,
-            ""
-        );
-
-}
-
-
-/* =========================
-   EXTRACT CANDIDATES
-========================= */
-
-function findMRZCandidates(rawText) {
-
-    const normalized =
-        normalizeOCR(rawText);
-
-    const rawLines =
-        normalized
-            .split(/\r?\n/)
-            .map(line =>
-                line.trim()
-            )
-            .filter(Boolean);
-
-    let candidates = [];
-
+    let chars =
+        line.split("");
 
     /*
-        First:
-        Look for lines that are
-        approximately 44 chars.
+        Positions which MUST be digits.
     */
 
-    for (
-        let i = 0;
-        i < rawLines.length;
-        i++
-    ) {
-
-        const line =
-            cleanMRZLine(
-                rawLines[i]
-            );
-
-        if (
-            line.length >= 35 &&
-            line.length <= 55
-        ) {
-
-            candidates.push(line);
-
-        }
-
-    }
-
-
-    /*
-        Sometimes OCR combines both lines.
-        Search inside complete text.
-    */
-
-    const joined =
-        rawLines.join("");
-
-    if (
-        joined.length >= 88
-    ) {
-
-        for (
-            let i = 0;
-            i <= joined.length - 88;
-            i++
-        ) {
-
-            const a =
-                joined.substring(
-                    i,
-                    i + 44
-                );
-
-            const b =
-                joined.substring(
-                    i + 44,
-                    i + 88
-                );
-
-            if (
-                looksLikeLine1(a) &&
-                looksLikeLine2(b)
-            ) {
-
-                candidates.push(a);
-                candidates.push(b);
-
-            }
-
-        }
-
-    }
-
-
-    /*
-        Remove duplicates
-    */
-
-    return [
-        ...new Set(candidates)
+    const digitPositions = [
+        9,
+        19,
+        27,
+        42,
+        43
     ];
 
-}
-
-
-/* =========================
-   LINE PATTERNS
-========================= */
-
-function looksLikeLine1(line) {
-
-    return (
-        line.length >= 40 &&
-        line.charAt(0) === "P"
-    );
-
-}
-
-
-function looksLikeLine2(line) {
-
-    if (
-        line.length < 40
-    ) {
-        return false;
-    }
-
-    return (
-        /[A-Z0-9<]{9}/.test(
-            line.substring(0, 9)
-        )
-    );
-
-}
-
-
-/* =========================
-   PAD / REPAIR LINE
-========================= */
-
-function repairLine(
-    line,
-    target = 44
-) {
-
-    line = cleanMRZLine(line);
-
-    /*
-        If OCR line is slightly short,
-        pad with <
-    */
-
-    if (
-        line.length < target
+    for (
+        const pos
+        of digitPositions
     ) {
 
-        return (
-            line +
-            "<".repeat(
-                target - line.length
-            )
-        );
+        if (
+            !chars[pos]
+        ) continue;
+
+        const c =
+            chars[pos];
+
+        if (c === "O")
+            chars[pos] = "0";
+
+        if (c === "I")
+            chars[pos] = "1";
+
+        if (c === "L")
+            chars[pos] = "1";
+
+        if (c === "Z")
+            chars[pos] = "2";
+
+        if (c === "S")
+            chars[pos] = "5";
+
+        if (c === "B")
+            chars[pos] = "8";
 
     }
 
     /*
-        If too long,
-        generate possible windows.
-        Caller handles candidates.
+        Nationality positions
+        should be letters.
     */
-
-    return line;
-
-}
-
-
-/* =========================
-   BUILD LINE PAIRS
-========================= */
-
-function buildPairs(
-    candidates
-) {
-
-    let pairs = [];
 
     for (
-        let i = 0;
-        i < candidates.length;
+        let i = 10;
+        i <= 12;
         i++
     ) {
 
-        for (
-            let j = 0;
-            j < candidates.length;
-            j++
+        if (
+            chars[i] === "0"
         ) {
+            chars[i] = "O";
+        }
 
-            if (i === j) continue;
-
-            let a =
-                candidates[i];
-
-            let b =
-                candidates[j];
-
-            /*
-                Generate possible 44-char
-                windows for each line.
-            */
-
-            const aWindows =
-                makeWindows(a);
-
-            const bWindows =
-                makeWindows(b);
-
-            for (
-                const line1 of aWindows
-            ) {
-
-                for (
-                    const line2 of bWindows
-                ) {
-
-                    if (
-                        line1.length === 44 &&
-                        line2.length === 44 &&
-                        looksLikeLine1(line1) &&
-                        looksLikeLine2(line2)
-                    ) {
-
-                        pairs.push({
-                            line1,
-                            line2
-                        });
-
-                    }
-
-                }
-
-            }
-
+        if (
+            chars[i] === "1"
+        ) {
+            chars[i] = "I";
         }
 
     }
 
-    return pairs;
+    /*
+        Sex.
+    */
+
+    if (
+        chars[20] === "1"
+    ) {
+        chars[20] = "I";
+    }
+
+    return chars.join("");
 
 }
 
 
-/* =========================
-   MAKE WINDOWS
-========================= */
+/* =========================================
+   REPAIR LENGTH
+   ONLY TRIM OCR EXCESS.
+   NEVER INVENT CHARACTERS.
+========================================= */
 
-function makeWindows(line) {
+function make44Candidates(
+    line
+) {
 
     line =
-        cleanMRZLine(line);
+        normalizeLine(line);
 
-    const result = [];
+    const output = [];
 
     if (
         line.length === 44
     ) {
 
-        result.push(line);
+        output.push(line);
 
-        return result;
+        return output;
 
     }
+
+    /*
+        If OCR produced >44,
+        test every 44-char window.
+    */
 
     if (
         line.length > 44
@@ -1133,7 +1248,7 @@ function makeWindows(line) {
             i++
         ) {
 
-            result.push(
+            output.push(
                 line.substring(
                     i,
                     i + 44
@@ -1144,110 +1259,166 @@ function makeWindows(line) {
 
     }
 
-    else {
+    /*
+        IMPORTANT:
+        We do NOT pad short lines.
 
-        result.push(
-            repairLine(line)
-        );
+        Padding was one of the causes
+        of false MRZ results in previous version.
+    */
 
-    }
-
-    return result;
+    return output;
 
 }
 
 
-/* =========================
-   SCORE PAIR
-========================= */
+/* =========================================
+   FIND BEST PAIR
+========================================= */
 
-function scorePair(
-    line1,
-    line2
+function findBestPair(
+    lines
 ) {
 
-    let score = 0;
+    let line1Candidates = [];
+    let line2Candidates = [];
 
-    if (
-        line1.length === 44
-    ) score += 10;
-
-    if (
-        line2.length === 44
-    ) score += 10;
-
-    if (
-        line1.startsWith("P<")
-    ) score += 20;
-
-    if (
-        /^[A-Z]{3}/.test(
-            line1.substring(2, 5)
-        )
-    ) score += 10;
-
-    const validation =
-        validateTD3(
-            line1,
-            line2
-        );
-
-    score +=
-        validation.passed * 25;
-
-    if (
-        /^[A-Z0-9<]{9}\d/.test(
-            line2
-        )
+    for (
+        const line of lines
     ) {
-        score += 10;
+
+        for (
+            const candidate
+            of make44Candidates(line)
+        ) {
+
+            const corrected =
+                correctLine2(
+                    candidate
+                );
+
+            /*
+                Possible line 1.
+            */
+
+            if (
+                scoreLine1(
+                    candidate
+                ) >= 60
+            ) {
+
+                line1Candidates.push(
+                    candidate
+                );
+
+            }
+
+            /*
+                Possible line 2.
+            */
+
+            if (
+                scoreLine2(
+                    corrected
+                ) >= 60
+            ) {
+
+                line2Candidates.push(
+                    corrected
+                );
+
+            }
+
+        }
+
     }
 
-    if (
-        /^[A-Z0-9<]{9}\d[A-Z]{3}\d{6}\d[MF<]\d{6}\d/.test(
-            line2
-        )
+    let best = null;
+
+    for (
+        const a
+        of line1Candidates
     ) {
-        score += 20;
+
+        for (
+            const b
+            of line2Candidates
+        ) {
+
+            const validation =
+                validate(
+                    a,
+                    b
+                );
+
+            let score =
+                scoreLine1(a) +
+                scoreLine2(b) +
+                validation.score;
+
+            if (
+                best === null ||
+                score > best.score
+            ) {
+
+                best = {
+
+                    line1: a,
+                    line2: b,
+
+                    validation,
+
+                    score
+
+                };
+
+            }
+
+        }
+
     }
 
-    return score;
+    return best;
 
 }
 
 
-/* =========================
-   PARSE NAME
-========================= */
+/* =========================================
+   NAME
+========================================= */
 
 function parseName(
-    line1
+    line
 ) {
 
-    const namePart =
-        line1.substring(
+    const value =
+        line.substring(
             5,
             44
         );
 
-    const sections =
-        namePart.split("<<");
+    const parts =
+        value.split("<<");
 
     const surname =
-        (sections[0] || "")
-            .replace(
-                /<+/g,
-                " "
-            )
-            .trim();
+        (
+            parts[0] || ""
+        )
+        .replace(
+            /<+/g,
+            " "
+        )
+        .trim();
 
     const given =
-        (sections[1] || "")
-            .replace(
-                /<+/g,
-                " "
-            )
-            .trim();
+        (
+            parts[1] || ""
+        )
+        .replace(
+            /<+/g,
+            " "
+        )
+        .trim();
 
     return {
         surname,
@@ -1257,66 +1428,87 @@ function parseName(
 }
 
 
-/* =========================
+/* =========================================
    DATE
-========================= */
+========================================= */
 
 function parseDate(
-    value,
+    raw,
     type
 ) {
 
     if (
-        !/^\d{6}$/.test(value)
+        !/^\d{6}$/.test(raw)
     ) {
-        return "غير معروفة";
+        return "غير موثوق";
     }
 
     const yy =
-        Number(value.substring(0, 2));
+        Number(
+            raw.substring(
+                0,
+                2
+            )
+        );
 
     const mm =
-        Number(value.substring(2, 4));
+        Number(
+            raw.substring(
+                2,
+                4
+            )
+        );
 
     const dd =
-        Number(value.substring(4, 6));
+        Number(
+            raw.substring(
+                4,
+                6
+            )
+        );
+
+    if (
+        mm < 1 ||
+        mm > 12 ||
+        dd < 1 ||
+        dd > 31
+    ) {
+
+        return "غير موثوق";
+
+    }
 
     let year;
 
-    if (type === "birth") {
+    const now =
+        new Date();
 
-        /*
-            Practical passport rule:
-            future year means previous century
-        */
+    const currentYear =
+        now.getFullYear();
 
-        const current =
-            new Date()
-                .getFullYear();
+    if (
+        type === "birth"
+    ) {
 
         const currentYY =
-            current % 100;
+            currentYear % 100;
 
         year =
             yy > currentYY
-            ? 1900 + yy
-            : 2000 + yy;
+                ? 1900 + yy
+                : 2000 + yy;
 
     }
 
     else {
 
-        const current =
-            new Date()
-                .getFullYear();
-
-        const currentYY =
-            current % 100;
+        /*
+            Expiry is normally
+            2000+YY for current passports.
+        */
 
         year =
-            yy < currentYY - 20
-            ? 2100 + yy
-            : 2000 + yy;
+            2000 + yy;
 
     }
 
@@ -1331,27 +1523,27 @@ function parseDate(
 }
 
 
-/* =========================
-   PARSE TD3
-========================= */
+/* =========================================
+   PARSE
+========================================= */
 
-function parseTD3(
+function parsePassport(
     line1,
-    line2
+    line2,
+    validation
 ) {
 
-    const validation =
-        validateTD3(
-            line1,
-            line2
-        );
-
     const name =
-        parseName(line1);
+        parseName(
+            line1
+        );
 
     const passportNumber =
         line2
-            .substring(0, 9)
+            .substring(
+                0,
+                9
+            )
             .replace(
                 /<+$/g,
                 ""
@@ -1363,16 +1555,16 @@ function parseTD3(
             13
         );
 
-    const birthRaw =
+    const birth =
         line2.substring(
             13,
             19
         );
 
     const sex =
-        line2.charAt(20);
+        line2[20];
 
-    const expiryRaw =
+    const expiry =
         line2.substring(
             21,
             27
@@ -1380,13 +1572,10 @@ function parseTD3(
 
     return {
 
-        line1,
-        line2,
-
         surname:
             name.surname,
 
-        givenName:
+        given:
             name.given,
 
         fullName:
@@ -1403,14 +1592,8 @@ function parseTD3(
 
         birthDate:
             parseDate(
-                birthRaw,
+                birth,
                 "birth"
-            ),
-
-        expiryDate:
-            parseDate(
-                expiryRaw,
-                "expiry"
             ),
 
         sex:
@@ -1420,6 +1603,15 @@ function parseTD3(
                     ? "أنثى"
                     : "غير محدد",
 
+        expiryDate:
+            parseDate(
+                expiry,
+                "expiry"
+            ),
+
+        line1,
+        line2,
+
         validation
 
     };
@@ -1427,736 +1619,125 @@ function parseTD3(
 }
 
 
-/* =========================
-   FIND BEST PAIR
-========================= */
+/* =========================================
+   PROCESS IMAGE
+========================================= */
 
-function findBestPair(
-    rawTexts
-) {
-
-    let allCandidates = [];
-
-    for (
-        const text of rawTexts
-    ) {
-
-        allCandidates.push(
-            ...findMRZCandidates(
-                text
-            )
-        );
-
-    }
-
-    allCandidates = [
-        ...new Set(
-            allCandidates
-        )
-    ];
-
-    const pairs =
-        buildPairs(
-            allCandidates
-        );
-
-    let best = null;
-    let bestScore = -1;
-
-    for (
-        const pair of pairs
-    ) {
-
-        const score =
-            scorePair(
-                pair.line1,
-                pair.line2
-            );
-
-        if (
-            score > bestScore
-        ) {
-
-            bestScore = score;
-
-            best = {
-                ...pair,
-                score
-            };
-
-        }
-
-    }
-
-    return best;
-
-}
-
-
-/* =========================
-   OCR ONE PASSPORT
-========================= */
-
-async function processPassport(
+async function processFile(
     file
 ) {
 
     const img =
-        await loadImage(file);
+        await loadImage(
+            file
+        );
 
-    const texts = [];
-
+    let allLines = [];
 
     /*
-        Multiple crop positions
+        Try several bottom regions.
     */
 
+    const cropPositions = [
+        0.55,
+        0.60,
+        0.65
+    ];
+
+    const imageModes = [
+        0,
+        1,
+        2
+    ];
+
+    const pageModes = [
+        6,
+        11,
+        7
+    ];
+
     for (
-        let cropMode = 0;
-        cropMode < 3;
-        cropMode++
+        const cropPosition
+        of cropPositions
     ) {
 
-        const cropped =
-            createMRZCanvas(
+        const crop =
+            cropBottom(
                 img,
-                cropMode
+                cropPosition
             );
 
-        /*
-            Original
-        */
-
-        const original =
-            await runOCR(
-                cropped
-            );
-
-        texts.push(original);
-
-
-        /*
-            Threshold 1
-        */
-
-        const processed1 =
-            preprocessCanvas(
-                cropped,
-                1
-            );
-
-        const ocr1 =
-            await runOCR(
-                processed1
-            );
-
-        texts.push(ocr1);
-
-
-        /*
-            Threshold 2
-        */
-
-        const processed2 =
-            preprocessCanvas(
-                cropped,
-                2
-            );
-
-        const ocr2 =
-            await runOCR(
-                processed2
-            );
-
-        texts.push(ocr2);
-
-
-        const best =
-            findBestPair(
-                texts
-            );
-
-        /*
-            If we already have
-            strong validation,
-            stop OCR.
-        */
-
-        if (
-            best &&
-            best.score >= 100
+        for (
+            const imageMode
+            of imageModes
         ) {
 
-            return {
-                file,
-                best
-            };
-
-        }
-
-    }
-
-    return {
-        file,
-        best:
-            findBestPair(texts)
-    };
-
-}
-
-
-/* =========================
-   DISPLAY RESULT
-========================= */
-
-function displayResult(
-    result,
-    index
-) {
-
-    const file =
-        result.file;
-
-    const best =
-        result.best;
-
-    const card =
-        document.createElement("div");
-
-    card.className = "card";
-
-
-    if (!best) {
-
-        card.innerHTML = `
-
-            <h2>جواز رقم ${index + 1}</h2>
-
-            <div class="filename">
-                ${escapeHTML(file.name)}
-            </div>
-
-            <div class="result-status invalid">
-                ❌ لم أستطع العثور على MRZ بشكل موثوق.
-            </div>
-
-            <p class="small-note">
-                جرّب صورة أوضح، تكون صفحة البيانات كاملة ظاهرة،
-                ومنطقة السطرين الموجودة أسفل الجواز واضحة وغير مقصوصة.
-            </p>
-
-        `;
-
-        resultsBox.appendChild(card);
-
-        return;
-
-    }
-
-
-    const data =
-        parseTD3(
-            best.line1,
-            best.line2
-        );
-
-    extractedResults.push(data);
-
-
-    const checks =
-        data.validation.checks;
-
-    const validationText =
-        data.validation.valid
-            ? "تم التحقق من MRZ بنجاح"
-            : "القراءة غير مؤكدة — يجب مراجعة الجواز";
-
-
-    const validationClass =
-        data.validation.valid
-            ? "valid"
-            : "warning";
-
-
-    card.innerHTML = `
-
-        <h2>جواز رقم ${index + 1}</h2>
-
-        <div class="filename">
-            ${escapeHTML(file.name)}
-        </div>
-
-        <div class="result-status ${validationClass}">
-            ${data.validation.valid ? "✅" : "⚠️"}
-            ${validationText}
-        </div>
-
-        <div class="fields">
-
-            <div class="field">
-                <label>الاسم الكامل</label>
-                <div class="field-value">
-                    ${escapeHTML(data.fullName || "غير معروف")}
-                </div>
-            </div>
-
-            <div class="field">
-                <label>اسم العائلة</label>
-                <div class="field-value">
-                    ${escapeHTML(data.surname || "غير معروف")}
-                </div>
-            </div>
-
-            <div class="field">
-                <label>الاسم الأول</label>
-                <div class="field-value">
-                    ${escapeHTML(data.givenName || "غير معروف")}
-                </div>
-            </div>
-
-            <div class="field">
-                <label>رقم الجواز</label>
-                <div class="field-value">
-                    ${escapeHTML(data.passportNumber)}
-                </div>
-            </div>
-
-            <div class="field">
-                <label>الجنسية</label>
-                <div class="field-value">
-                    ${escapeHTML(data.nationality)}
-                </div>
-            </div>
-
-            <div class="field">
-                <label>تاريخ الميلاد</label>
-                <div class="field-value">
-                    ${escapeHTML(data.birthDate)}
-                </div>
-            </div>
-
-            <div class="field">
-                <label>الجنس</label>
-                <div class="field-value">
-                    ${escapeHTML(data.sex)}
-                </div>
-            </div>
-
-            <div class="field">
-                <label>تاريخ انتهاء الجواز</label>
-                <div class="field-value">
-                    ${escapeHTML(data.expiryDate)}
-                </div>
-            </div>
-
-        </div>
-
-
-        <div class="field full-width" style="margin-top:15px">
-
-            <label>
-                نتيجة فحص Check Digits
-            </label>
-
-            <div class="field-value">
-
-                رقم الجواز:
-                ${checks.passport ? "✅" : "❌"}
-
-                &nbsp;
-
-                الميلاد:
-                ${checks.birth ? "✅" : "❌"}
-
-                &nbsp;
-
-                الانتهاء:
-                ${checks.expiry ? "✅" : "❌"}
-
-                &nbsp;
-
-                البيانات الإضافية:
-                ${checks.personal ? "✅" : "❌"}
-
-                &nbsp;
-
-                MRZ كامل:
-                ${checks.composite ? "✅" : "❌"}
-
-            </div>
-
-        </div>
-
-
-        <div class="full-width">
-
-            <label>
-                MRZ
-            </label>
-
-            <div class="mrz-box">
-
-                ${escapeHTML(data.line1)}
-                <br>
-                ${escapeHTML(data.line2)}
-
-            </div>
-
-        </div>
-
-
-        <div class="copy-row">
-
-            <button
-                class="btn-copy"
-                onclick="copyResult(${extractedResults.length - 1})"
-            >
-                نسخ بيانات هذا الجواز
-            </button>
-
-        </div>
-
-    `;
-
-
-    resultsBox.appendChild(card);
-
-}
-
-
-/* =========================
-   COPY RESULT
-========================= */
-
-async function copyResult(
-    index
-) {
-
-    const data =
-        extractedResults[index];
-
-    if (!data) return;
-
-    const text =
-
-`الاسم الكامل: ${data.fullName}
-اسم العائلة: ${data.surname}
-الاسم الأول: ${data.givenName}
-رقم الجواز: ${data.passportNumber}
-الجنسية: ${data.nationality}
-تاريخ الميلاد: ${data.birthDate}
-الجنس: ${data.sex}
-تاريخ الانتهاء: ${data.expiryDate}
-
-MRZ:
-${data.line1}
-${data.line2}`;
-
-    await navigator.clipboard.writeText(
-        text
-    );
-
-    alert(
-        "تم نسخ بيانات الجواز"
-    );
-
-}
-
-
-/* =========================
-   COPY ALL
-========================= */
-
-copyAllBtn.addEventListener(
-    "click",
-    async function() {
-
-        if (
-            !extractedResults.length
-        ) {
-            return;
-        }
-
-        const all =
-            extractedResults
-                .map(
-                    (data, index) =>
-
-`الجواز ${index + 1}
-الاسم الكامل: ${data.fullName}
-اسم العائلة: ${data.surname}
-الاسم الأول: ${data.givenName}
-رقم الجواز: ${data.passportNumber}
-الجنسية: ${data.nationality}
-تاريخ الميلاد: ${data.birthDate}
-الجنس: ${data.sex}
-تاريخ الانتهاء: ${data.expiryDate}
-
-MRZ:
-${data.line1}
-${data.line2}
-
---------------------------
-`
-                )
-                .join("\n");
-
-        await navigator.clipboard.writeText(
-            all
-        );
-
-        alert(
-            "تم نسخ جميع البيانات"
-        );
-
-    }
-);
-
-
-/* =========================
-   PROCESS ALL FILES
-========================= */
-
-processBtn.addEventListener(
-    "click",
-    async function() {
-
-        if (
-            !selectedFiles.length
-        ) {
-            return;
-        }
-
-        resultsBox.innerHTML = "";
-
-        extractedResults = [];
-
-        copyAllBtn.disabled = true;
-
-        processBtn.disabled = true;
-
-        try {
-
-            for (
-                let i = 0;
-                i < selectedFiles.length;
-                i++
-            ) {
-
-                const file =
-                    selectedFiles[i];
-
-                setStatus(
-                    `جاري معالجة الجواز ${i + 1} من ${selectedFiles.length}: ${file.name}`,
-                    Math.round(
-                        (i /
-                        selectedFiles.length) *
-                        100
-                    )
-                );
-
-                const result =
-                    await processPassport(
-                        file
+            const image =
+                imageMode === 0
+                    ? crop
+                    : processImage(
+                        crop,
+                        imageMode
                     );
 
-                displayResult(
-                    result,
-                    i
+            for (
+                const psm
+                of pageModes
+            ) {
+
+                status(
+                    `تحليل ${file.name} ...`
                 );
 
+                const data =
+                    await OCR(
+                        image,
+                        psm
+                    );
+
+                const lines =
+                    collectOCRLines(
+                        data
+                    );
+
+                allLines.push(
+                    ...lines
+                );
+
+                /*
+                    Test immediately.
+                */
+
+                const best =
+                    findBestPair(
+                        allLines
+                    );
+
+                if (
+                    best &&
+                    best.validation.valid
+                ) {
+
+                    return best;
+
+                }
+
             }
 
-            setStatus(
-                `اكتملت المعالجة. تم فحص ${selectedFiles.length} صورة.`,
-                100
-            );
-
-            copyAllBtn.disabled =
-                extractedResults.length === 0;
-
         }
-
-        catch (error) {
-
-            console.error(error);
-
-            setStatus(
-                "حدث خطأ أثناء المعالجة. جرّب صورة أوضح."
-            );
-
-        }
-
-        processBtn.disabled = false;
 
     }
-);
+
+    return findBestPair(
+        allLines
+    );
+
+}
 
 
-/* =========================
-   MANUAL MRZ
-========================= */
-
-manualBtn.addEventListener(
-    "click",
-    function() {
-
-        const text =
-            manualMrz.value
-                .toUpperCase()
-                .trim();
-
-        let lines =
-            text
-                .split(/\r?\n/)
-                .map(
-                    x =>
-                        cleanMRZLine(x)
-                )
-                .filter(Boolean);
-
-
-        /*
-            If user pasted everything
-            in one line, split it.
-        */
-
-        if (
-            lines.length === 1 &&
-            lines[0].length >= 88
-        ) {
-
-            lines = [
-
-                lines[0].substring(
-                    0,
-                    44
-                ),
-
-                lines[0].substring(
-                    44,
-                    88
-                )
-
-            ];
-
-        }
-
-
-        if (
-            lines.length < 2
-        ) {
-
-            alert(
-                "يجب إدخال سطري MRZ."
-            );
-
-            return;
-
-        }
-
-
-        const line1 =
-            lines[0].substring(
-                0,
-                44
-            );
-
-        const line2 =
-            lines[1].substring(
-                0,
-                44
-            );
-
-
-        if (
-            line1.length !== 44 ||
-            line2.length !== 44
-        ) {
-
-            alert(
-                "MRZ غير مكتمل. كل سطر يجب أن يحتوي على 44 خانة."
-            );
-
-            return;
-
-        }
-
-
-        const validation =
-            validateTD3(
-                line1,
-                line2
-            );
-
-
-        const fakeFile = {
-            name:
-                "إدخال MRZ يدوي"
-        };
-
-
-        const result = {
-            file: fakeFile,
-            best: {
-                line1,
-                line2,
-                score:
-                    scorePair(
-                        line1,
-                        line2
-                    )
-            }
-        };
-
-
-        displayResult(
-            result,
-            extractedResults.length
-        );
-
-
-        copyAllBtn.disabled = false;
-
-    }
-);
-
-
-/* =========================
-   CLEAR
-========================= */
-
-clearBtn.addEventListener(
-    "click",
-    function() {
-
-        selectedFiles = [];
-
-        extractedResults = [];
-
-        fileInput.value = "";
-
-        resultsBox.innerHTML = "";
-
-        manualMrz.value = "";
-
-        processBtn.disabled = true;
-
-        copyAllBtn.disabled = true;
-
-        progressBar.style.width =
-            "0%";
-
-        statusBox.textContent =
-            "تم مسح كل البيانات.";
-
-    }
-);
-
-
-/* =========================
-   ESCAPE HTML
-========================= */
+/* =========================================
+   ESCAPE
+========================================= */
 
 function escapeHTML(
     value
@@ -2185,6 +1766,441 @@ function escapeHTML(
         );
 
 }
+
+
+/* =========================================
+   DISPLAY
+========================================= */
+
+function display(
+    file,
+    best,
+    index
+) {
+
+    const card =
+        document.createElement(
+            "div"
+        );
+
+    card.className =
+        "card";
+
+
+    /*
+        No reliable MRZ.
+    */
+
+    if (
+        !best ||
+        !best.validation.valid
+    ) {
+
+        card.innerHTML = `
+
+            <h2>الجواز ${index + 1}</h2>
+
+            <div class="filename">
+                ${escapeHTML(file.name)}
+            </div>
+
+            <div class="result warning">
+                ⚠️ لم يتم اعتماد البيانات
+            </div>
+
+            <p class="note">
+                الموقع وجد نصوصًا محتملة، لكن لم تستوفِ
+                شروط التحقق الخاصة بالـMRZ.
+                لذلك لن أعرض اسمًا أو رقم جواز عشوائي.
+            </p>
+
+        `;
+
+        resultsBox.appendChild(
+            card
+        );
+
+        return;
+
+    }
+
+
+    const data =
+        parsePassport(
+            best.line1,
+            best.line2,
+            best.validation
+        );
+
+    results.push(
+        data
+    );
+
+
+    const c =
+        data.validation.checks;
+
+
+    card.innerHTML = `
+
+        <h2>الجواز ${index + 1}</h2>
+
+        <div class="filename">
+            ${escapeHTML(file.name)}
+        </div>
+
+        <div class="result success">
+            ✅ تم التحقق من MRZ
+        </div>
+
+        <div class="fields">
+
+            <div class="field">
+                <label>الاسم الكامل</label>
+                <div class="value">
+                    ${escapeHTML(data.fullName)}
+                </div>
+            </div>
+
+            <div class="field">
+                <label>اسم العائلة</label>
+                <div class="value">
+                    ${escapeHTML(data.surname)}
+                </div>
+            </div>
+
+            <div class="field">
+                <label>الأسماء</label>
+                <div class="value">
+                    ${escapeHTML(data.given)}
+                </div>
+            </div>
+
+            <div class="field">
+                <label>رقم الجواز</label>
+                <div class="value">
+                    ${escapeHTML(data.passportNumber)}
+                </div>
+            </div>
+
+            <div class="field">
+                <label>الجنسية</label>
+                <div class="value">
+                    ${escapeHTML(data.nationality)}
+                </div>
+            </div>
+
+            <div class="field">
+                <label>تاريخ الميلاد</label>
+                <div class="value">
+                    ${escapeHTML(data.birthDate)}
+                </div>
+            </div>
+
+            <div class="field">
+                <label>الجنس</label>
+                <div class="value">
+                    ${escapeHTML(data.sex)}
+                </div>
+            </div>
+
+            <div class="field">
+                <label>تاريخ الانتهاء</label>
+                <div class="value">
+                    ${escapeHTML(data.expiryDate)}
+                </div>
+            </div>
+
+            <div class="field">
+                <label>الدولة المصدرة</label>
+                <div class="value">
+                    ${escapeHTML(
+                        data.line1.substring(
+                            2,
+                            5
+                        )
+                    )}
+                </div>
+            </div>
+
+            <div class="field full">
+                <label>MRZ</label>
+
+                <div class="mrz">
+
+                    ${escapeHTML(
+                        data.line1
+                    )}
+
+                    <br>
+
+                    ${escapeHTML(
+                        data.line2
+                    )}
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="checks">
+
+            <strong>
+                فحص البيانات:
+            </strong>
+
+            <br>
+
+            رقم الجواز:
+            ${c.passport ? "✅" : "❌"}
+
+            <br>
+
+            تاريخ الميلاد:
+            ${c.birth ? "✅" : "❌"}
+
+            <br>
+
+            تاريخ الانتهاء:
+            ${c.expiry ? "✅" : "❌"}
+
+            <br>
+
+            البيانات الإضافية:
+            ${c.personal ? "✅" : "❌"}
+
+            <br>
+
+            MRZ الكامل:
+            ${c.composite ? "✅" : "❌"}
+
+        </div>
+
+        <div class="buttons">
+
+            <button
+                class="green"
+                onclick="copyOne(${results.length - 1})"
+            >
+                نسخ البيانات
+            </button>
+
+        </div>
+
+    `;
+
+    resultsBox.appendChild(
+        card
+    );
+
+}
+
+
+/* =========================================
+   COPY ONE
+========================================= */
+
+async function copyOne(
+    index
+) {
+
+    const d =
+        results[index];
+
+    if (!d) return;
+
+    const text =
+
+`الاسم الكامل: ${d.fullName}
+اسم العائلة: ${d.surname}
+الأسماء: ${d.given}
+رقم الجواز: ${d.passportNumber}
+الجنسية: ${d.nationality}
+تاريخ الميلاد: ${d.birthDate}
+الجنس: ${d.sex}
+تاريخ الانتهاء: ${d.expiryDate}
+الدولة المصدرة: ${d.line1.substring(2,5)}
+
+MRZ:
+${d.line1}
+${d.line2}`;
+
+    await navigator.clipboard.writeText(
+        text
+    );
+
+    alert(
+        "تم نسخ البيانات"
+    );
+
+}
+
+
+/* =========================================
+   COPY ALL
+========================================= */
+
+copyAllButton.addEventListener(
+    "click",
+    async () => {
+
+        if (!results.length)
+            return;
+
+        const text =
+            results
+                .map(
+                    (d, i) =>
+
+`الجواز ${i + 1}
+الاسم الكامل: ${d.fullName}
+اسم العائلة: ${d.surname}
+الأسماء: ${d.given}
+رقم الجواز: ${d.passportNumber}
+الجنسية: ${d.nationality}
+تاريخ الميلاد: ${d.birthDate}
+الجنس: ${d.sex}
+تاريخ الانتهاء: ${d.expiryDate}
+الدولة المصدرة: ${d.line1.substring(2,5)}
+
+MRZ:
+${d.line1}
+${d.line2}
+
+-------------------------
+`
+                )
+                .join("\n");
+
+        await navigator.clipboard.writeText(
+            text
+        );
+
+        alert(
+            "تم نسخ جميع البيانات"
+        );
+
+    }
+);
+
+
+/* =========================================
+   START
+========================================= */
+
+startButton.addEventListener(
+    "click",
+    async () => {
+
+        if (!files.length)
+            return;
+
+        resultsBox.innerHTML = "";
+
+        results = [];
+
+        startButton.disabled = true;
+
+        copyAllButton.disabled = true;
+
+        progressBar.style.width =
+            "0%";
+
+        try {
+
+            for (
+                let i = 0;
+                i < files.length;
+                i++
+            ) {
+
+                const file =
+                    files[i];
+
+                status(
+                    `الجواز ${i + 1} من ${files.length}: ${file.name}`,
+                    Math.round(
+                        (
+                            i /
+                            files.length
+                        ) * 100
+                    )
+                );
+
+                const best =
+                    await processFile(
+                        file
+                    );
+
+                display(
+                    file,
+                    best,
+                    i
+                );
+
+            }
+
+            progressBar.style.width =
+                "100%";
+
+            status(
+                `انتهت المعالجة. تم فحص ${files.length} جواز.`
+            );
+
+            copyAllButton.disabled =
+                results.length === 0;
+
+        }
+
+        catch (error) {
+
+            console.error(
+                error
+            );
+
+            status(
+                "حدث خطأ أثناء قراءة الصور. جرّب صورة أوضح."
+            );
+
+        }
+
+        startButton.disabled =
+            false;
+
+    }
+);
+
+
+/* =========================================
+   CLEAR
+========================================= */
+
+clearButton.addEventListener(
+    "click",
+    () => {
+
+        files = [];
+
+        results = [];
+
+        filesInput.value = "";
+
+        resultsBox.innerHTML = "";
+
+        startButton.disabled =
+            true;
+
+        copyAllButton.disabled =
+            true;
+
+        progressBar.style.width =
+            "0%";
+
+        statusBox.textContent =
+            "تم مسح البيانات.";
+
+    }
+);
 
 </script>
 
