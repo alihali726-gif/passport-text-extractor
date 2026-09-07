@@ -1,1 +1,643 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<title>استخراج بيانات الجواز</title>
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: Tahoma, Arial, sans-serif;
+    background:
+        radial-gradient(circle at top right, #1d4ed8 0%, transparent 35%),
+        radial-gradient(circle at bottom left, #0ea5e9 0%, transparent 30%),
+        #07152f;
+    color: white;
+    padding: 25px 15px;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+}
+
+.card {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 28px;
+    padding: 30px;
+    box-shadow: 0 25px 70px rgba(0,0,0,0.35);
+    backdrop-filter: blur(18px);
+}
+
+.logo {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 15px;
+    border-radius: 20px;
+    background: linear-gradient(135deg,#2563eb,#06b6d4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 34px;
+}
+
+h1 {
+    text-align: center;
+    margin: 0;
+    font-size: 30px;
+}
+
+.subtitle {
+    text-align: center;
+    color: #b8c7e6;
+    margin: 12px 0 25px;
+    line-height: 1.8;
+}
+
+.upload-box {
+    border: 2px dashed rgba(255,255,255,0.25);
+    border-radius: 20px;
+    padding: 35px 20px;
+    text-align: center;
+    cursor: pointer;
+    background: rgba(0,0,0,0.15);
+    transition: .2s;
+}
+
+.upload-box:hover {
+    background: rgba(37,99,235,0.15);
+    border-color: #38bdf8;
+}
+
+.upload-icon {
+    font-size: 45px;
+    margin-bottom: 10px;
+}
+
+.upload-title {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.upload-subtitle {
+    color: #8fa8d4;
+    font-size: 12px;
+    margin-top: 8px;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+.actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+button {
+    border: none;
+    border-radius: 14px;
+    padding: 14px;
+    font-family: inherit;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    font-size: 14px;
+}
+
+.primary {
+    background: linear-gradient(135deg,#2563eb,#0ea5e9);
+}
+
+.secondary {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.12);
+}
+
+button:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+}
+
+.status {
+    margin-top: 20px;
+    text-align: center;
+    color: #9fdcff;
+    font-size: 13px;
+    display: none;
+}
+
+.progress {
+    width: 100%;
+    height: 8px;
+    background: rgba(255,255,255,.1);
+    border-radius: 20px;
+    overflow: hidden;
+    margin-top: 10px;
+    display: none;
+}
+
+.progress-bar {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg,#2563eb,#06b6d4);
+    transition: width .2s;
+}
+
+.results {
+    margin-top: 25px;
+}
+
+.result-card {
+    background: rgba(0,0,0,.22);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 18px;
+    padding: 18px;
+    margin-bottom: 12px;
+}
+
+.result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.result-title {
+    font-weight: bold;
+    color: #dbeafe;
+}
+
+.copy {
+    background: #0ea5e9;
+    padding: 8px 12px;
+    font-size: 11px;
+}
+
+.result-text {
+    width: 100%;
+    min-height: 180px;
+    resize: vertical;
+    border: none;
+    outline: none;
+    border-radius: 12px;
+    padding: 14px;
+    background: rgba(0,0,0,.3);
+    color: white;
+    font-family: Consolas, monospace;
+    font-size: 13px;
+    direction: ltr;
+    text-align: left;
+}
+
+.stats {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,.1);
+}
+
+.stat {
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 22px;
+    font-weight: bold;
+    color: #38bdf8;
+}
+
+.stat-label {
+    color: #8fa8d4;
+    font-size: 11px;
+    margin-top: 4px;
+}
+
+.notice {
+    margin-top: 20px;
+    padding: 12px;
+    border-radius: 13px;
+    background: rgba(14,165,233,.1);
+    border: 1px solid rgba(14,165,233,.2);
+    color: #9fdcff;
+    font-size: 11px;
+    text-align: center;
+    line-height: 1.8;
+}
+
+.toast {
+    position: fixed;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #0f172a;
+    padding: 12px 20px;
+    border-radius: 12px;
+    opacity: 0;
+    transition: .3s;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+@media(max-width:600px) {
+
+    .card {
+        padding: 20px 15px;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    .actions {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="card">
+
+    <div class="logo">🛂</div>
+
+    <h1>استخراج بيانات الجواز</h1>
+
+    <div class="subtitle">
+        ارفع صورة جواز واحدة أو عدة جوازات دفعة واحدة
+        واستخرج البيانات كنص قابل للنسخ
+    </div>
+
+    <label class="upload-box" for="passportFiles">
+
+        <div class="upload-icon">📂</div>
+
+        <div class="upload-title">
+            اضغط لاختيار صور الجوازات
+        </div>
+
+        <div class="upload-subtitle">
+            يمكنك اختيار عدد كبير من الصور دفعة واحدة
+        </div>
+
+    </label>
+
+    <input
+        type="file"
+        id="passportFiles"
+        accept="image/*"
+        multiple
+    >
+
+    <div class="actions">
+
+        <button
+            class="primary"
+            id="startButton"
+            onclick="startProcessing()"
+            disabled
+        >
+            🔍 بدء استخراج البيانات
+        </button>
+
+        <button
+            class="secondary"
+            onclick="copyAll()"
+            id="copyAllButton"
+            disabled
+        >
+            📋 نسخ جميع البيانات
+        </button>
+
+    </div>
+
+    <div class="status" id="status">
+        جاري تجهيز الصور...
+    </div>
+
+    <div class="progress" id="progress">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="results" id="results"></div>
+
+    <div class="stats">
+
+        <div class="stat">
+            <div class="stat-number" id="fileCount">0</div>
+            <div class="stat-label">الصور المختارة</div>
+        </div>
+
+        <div class="stat">
+            <div class="stat-number" id="processedCount">0</div>
+            <div class="stat-label">تمت المعالجة</div>
+        </div>
+
+    </div>
+
+    <div class="notice">
+        ⚠️ استخدم الموقع لمعالجة الوثائق التي لديك الحق في معالجتها.
+        يتم تنفيذ قراءة النص داخل المتصفح، ولا يقوم هذا الموقع بحفظ صور الجوازات.
+    </div>
+
+</div>
+
+</div>
+
+<div class="toast" id="toast">
+    تم النسخ بنجاح ✓
+</div>
+
+<script>
+
+let selectedFiles = [];
+let extractedTexts = [];
+
+const fileInput = document.getElementById("passportFiles");
+const startButton = document.getElementById("startButton");
+const copyAllButton = document.getElementById("copyAllButton");
+
+fileInput.addEventListener("change", function() {
+
+    selectedFiles = Array.from(this.files);
+
+    document.getElementById("fileCount").textContent =
+        selectedFiles.length;
+
+    document.getElementById("processedCount").textContent = "0";
+
+    extractedTexts = [];
+
+    document.getElementById("results").innerHTML = "";
+
+    startButton.disabled = selectedFiles.length === 0;
+
+    copyAllButton.disabled = true;
+
+});
+
+async function startProcessing() {
+
+    if (selectedFiles.length === 0) {
+        return;
+    }
+
+    startButton.disabled = true;
+
+    extractedTexts = [];
+
+    const results = document.getElementById("results");
+
+    results.innerHTML = "";
+
+    document.getElementById("progress").style.display = "block";
+
+    document.getElementById("status").style.display = "block";
+
+    for (let i = 0; i < selectedFiles.length; i++) {
+
+        const file = selectedFiles[i];
+
+        document.getElementById("status").textContent =
+            "جاري قراءة الجواز " +
+            (i + 1) +
+            " من " +
+            selectedFiles.length;
+
+        const percentage =
+            Math.round((i / selectedFiles.length) * 100);
+
+        document.getElementById("progressBar").style.width =
+            percentage + "%";
+
+        try {
+
+            const result =
+                await Tesseract.recognize(
+                    file,
+                    "eng",
+                    {
+                        logger: info => {
+
+                            if (
+                                info.status === "recognizing text"
+                                &&
+                                typeof info.progress === "number"
+                            ) {
+
+                                const localProgress =
+                                    info.progress * 100;
+
+                                const totalProgress =
+                                    ((i + localProgress / 100)
+                                    / selectedFiles.length) * 100;
+
+                                document.getElementById(
+                                    "progressBar"
+                                ).style.width =
+                                    totalProgress + "%";
+                            }
+
+                        }
+                    }
+                );
+
+            const text = result.data.text.trim();
+
+            extractedTexts.push(text);
+
+            addResult(
+                i + 1,
+                file.name,
+                text
+            );
+
+            document.getElementById("processedCount").textContent =
+                i + 1;
+
+        } catch (error) {
+
+            extractedTexts.push("");
+
+            addResult(
+                i + 1,
+                file.name,
+                "تعذر قراءة هذه الصورة."
+            );
+
+        }
+
+    }
+
+    document.getElementById("progressBar").style.width = "100%";
+
+    document.getElementById("status").textContent =
+        "✅ اكتملت معالجة جميع الصور";
+
+    copyAllButton.disabled =
+        extractedTexts.length === 0;
+
+    startButton.disabled = false;
+
+}
+
+function addResult(index, fileName, text) {
+
+    const results =
+        document.getElementById("results");
+
+    const card =
+        document.createElement("div");
+
+    card.className = "result-card";
+
+    card.innerHTML = `
+
+        <div class="result-header">
+
+            <div class="result-title">
+                جواز رقم ${index}
+                <br>
+                <small>${escapeHtml(fileName)}</small>
+            </div>
+
+            <button class="copy"
+                    onclick="copySpecific(this)">
+                📋 نسخ
+            </button>
+
+        </div>
+
+        <textarea class="result-text">${escapeHtml(text)}</textarea>
+
+    `;
+
+    results.appendChild(card);
+
+}
+
+function copySpecific(button) {
+
+    const textarea =
+        button.parentElement
+        .parentElement
+        .querySelector(".result-text");
+
+    copyText(textarea.value);
+
+}
+
+function copyAll() {
+
+    const textareas =
+        document.querySelectorAll(".result-text");
+
+    if (textareas.length === 0) {
+
+        showToast("لا توجد بيانات للنسخ");
+
+        return;
+    }
+
+    let allText = "";
+
+    textareas.forEach((textarea, index) => {
+
+        allText +=
+            "====================\n";
+
+        allText +=
+            "جواز رقم " +
+            (index + 1) +
+            "\n";
+
+        allText +=
+            "====================\n";
+
+        allText +=
+            textarea.value.trim() +
+            "\n\n";
+
+    });
+
+    copyText(allText);
+
+}
+
+function copyText(text) {
+
+    navigator.clipboard.writeText(text)
+        .then(() => showToast())
+        .catch(() => {
+
+            const textarea =
+                document.createElement("textarea");
+
+            textarea.value = text;
+
+            document.body.appendChild(textarea);
+
+            textarea.select();
+
+            document.execCommand("copy");
+
+            textarea.remove();
+
+            showToast();
+
+        });
+
+}
+
+function showToast(message = "تم النسخ بنجاح ✓") {
+
+    const toast =
+        document.getElementById("toast");
+
+    toast.textContent = message;
+
+    toast.classList.add("show");
+
+    setTimeout(() => {
+
+        toast.classList.remove("show");
+
+    }, 1800);
+
+}
+
+function escapeHtml(text) {
+
+    return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+</script>
+
+</body>
+</html>
