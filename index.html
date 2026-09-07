@@ -26,7 +26,8 @@ body {
 }
 
 .container {
-    max-width: 900px;
+    width: 100%;
+    max-width: 950px;
     margin: auto;
 }
 
@@ -62,9 +63,11 @@ h1 {
     color: #b8c7e6;
     margin: 12px 0 25px;
     line-height: 1.8;
+    font-size: 14px;
 }
 
 .upload-box {
+    display: block;
     border: 2px dashed rgba(255,255,255,0.25);
     border-radius: 20px;
     padding: 35px 20px;
@@ -101,7 +104,7 @@ input[type="file"] {
 
 .actions {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 10px;
     margin-top: 15px;
 }
@@ -117,6 +120,11 @@ button {
     font-size: 14px;
 }
 
+button:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+}
+
 .primary {
     background: linear-gradient(135deg,#2563eb,#0ea5e9);
 }
@@ -126,9 +134,9 @@ button {
     border: 1px solid rgba(255,255,255,0.12);
 }
 
-button:disabled {
-    opacity: .45;
-    cursor: not-allowed;
+.danger {
+    background: rgba(239,68,68,.18);
+    border: 1px solid rgba(239,68,68,.25);
 }
 
 .status {
@@ -173,12 +181,17 @@ button:disabled {
     justify-content: space-between;
     align-items: center;
     gap: 10px;
-    margin-bottom: 12px;
+    margin-bottom: 15px;
 }
 
 .result-title {
     font-weight: bold;
     color: #dbeafe;
+}
+
+.result-title small {
+    color: #8fa8d4;
+    font-weight: normal;
 }
 
 .copy {
@@ -187,20 +200,66 @@ button:disabled {
     font-size: 11px;
 }
 
-.result-text {
+.data-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+.data-box {
+    background: rgba(255,255,255,.06);
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.data-label {
+    color: #8fa8d4;
+    font-size: 10px;
+    margin-bottom: 5px;
+}
+
+.data-value {
+    font-family: Consolas, monospace;
+    direction: ltr;
+    text-align: left;
+    font-size: 13px;
+    font-weight: bold;
+    word-break: break-word;
+}
+
+.mrz-box {
+    margin-top: 12px;
+}
+
+.mrz-text {
     width: 100%;
-    min-height: 180px;
+    min-height: 75px;
     resize: vertical;
     border: none;
     outline: none;
     border-radius: 12px;
-    padding: 14px;
-    background: rgba(0,0,0,.3);
-    color: white;
+    padding: 12px;
+    background: rgba(0,0,0,.35);
+    color: #9fdcff;
     font-family: Consolas, monospace;
-    font-size: 13px;
+    font-size: 12px;
     direction: ltr;
     text-align: left;
+}
+
+.warning {
+    margin-top: 12px;
+    padding: 10px;
+    border-radius: 10px;
+    background: rgba(245,158,11,.1);
+    border: 1px solid rgba(245,158,11,.2);
+    color: #fcd34d;
+    font-size: 11px;
+    line-height: 1.7;
+}
+
+.error {
+    color: #fca5a5;
 }
 
 .stats {
@@ -248,7 +307,9 @@ button:disabled {
     padding: 12px 20px;
     border-radius: 12px;
     opacity: 0;
+    pointer-events: none;
     transition: .3s;
+    z-index: 100;
 }
 
 .toast.show {
@@ -269,6 +330,10 @@ button:disabled {
     .actions {
         grid-template-columns: 1fr;
     }
+
+    .data-grid {
+        grid-template-columns: 1fr;
+    }
 }
 </style>
 </head>
@@ -284,8 +349,7 @@ button:disabled {
     <h1>استخراج بيانات الجواز</h1>
 
     <div class="subtitle">
-        ارفع صورة جواز واحدة أو عدة جوازات دفعة واحدة
-        واستخرج البيانات كنص قابل للنسخ
+        قراءة منطقة MRZ واستخراج بيانات الجواز تلقائياً
     </div>
 
     <label class="upload-box" for="passportFiles">
@@ -317,23 +381,28 @@ button:disabled {
             onclick="startProcessing()"
             disabled
         >
-            🔍 بدء استخراج البيانات
+            🔍 قراءة الجوازات
         </button>
 
         <button
             class="secondary"
-            onclick="copyAll()"
             id="copyAllButton"
+            onclick="copyAll()"
             disabled
         >
-            📋 نسخ جميع البيانات
+            📋 نسخ الكل
+        </button>
+
+        <button
+            class="danger"
+            onclick="clearAll()"
+        >
+            🗑️ مسح النتائج
         </button>
 
     </div>
 
-    <div class="status" id="status">
-        جاري تجهيز الصور...
-    </div>
+    <div class="status" id="status"></div>
 
     <div class="progress" id="progress">
         <div class="progress-bar" id="progressBar"></div>
@@ -356,8 +425,9 @@ button:disabled {
     </div>
 
     <div class="notice">
-        ⚠️ استخدم الموقع لمعالجة الوثائق التي لديك الحق في معالجتها.
-        يتم تنفيذ قراءة النص داخل المتصفح، ولا يقوم هذا الموقع بحفظ صور الجوازات.
+        ⚠️ يتم تنفيذ المعالجة داخل المتصفح.
+        لا يتم حفظ صور الجوازات بواسطة هذا الموقع.
+        تأكد من مراجعة البيانات المستخرجة قبل استخدامها.
     </div>
 
 </div>
@@ -371,137 +441,751 @@ button:disabled {
 <script>
 
 let selectedFiles = [];
-let extractedTexts = [];
+let extractedResults = [];
 
-const fileInput = document.getElementById("passportFiles");
-const startButton = document.getElementById("startButton");
-const copyAllButton = document.getElementById("copyAllButton");
+const fileInput =
+    document.getElementById("passportFiles");
+
+const startButton =
+    document.getElementById("startButton");
+
+const copyAllButton =
+    document.getElementById("copyAllButton");
 
 fileInput.addEventListener("change", function() {
 
-    selectedFiles = Array.from(this.files);
+    selectedFiles =
+        Array.from(this.files);
 
     document.getElementById("fileCount").textContent =
         selectedFiles.length;
 
-    document.getElementById("processedCount").textContent = "0";
+    document.getElementById("processedCount").textContent =
+        "0";
 
-    extractedTexts = [];
+    extractedResults = [];
 
     document.getElementById("results").innerHTML = "";
 
-    startButton.disabled = selectedFiles.length === 0;
-
     copyAllButton.disabled = true;
+
+    startButton.disabled =
+        selectedFiles.length === 0;
 
 });
 
+/*
+==================================================
+تحضير الصورة للـ OCR
+==================================================
+*/
+
+async function prepareImage(file) {
+
+    const image =
+        await loadImage(file);
+
+    const canvas =
+        document.createElement("canvas");
+
+    const ctx =
+        canvas.getContext("2d");
+
+    /*
+    نكبر الصورة حتى تكون الأحرف أوضح للـ OCR
+    */
+
+    const scale = 2;
+
+    canvas.width =
+        image.width * scale;
+
+    canvas.height =
+        image.height * scale;
+
+    ctx.drawImage(
+        image,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    /*
+    تحسين التباين
+    */
+
+    const imageData =
+        ctx.getImageData(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+    const data =
+        imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+
+        const gray =
+            0.299 * data[i] +
+            0.587 * data[i + 1] +
+            0.114 * data[i + 2];
+
+        data[i] = gray;
+        data[i + 1] = gray;
+        data[i + 2] = gray;
+    }
+
+    ctx.putImageData(
+        imageData,
+        0,
+        0
+    );
+
+    return canvas;
+}
+
+function loadImage(file) {
+
+    return new Promise((resolve, reject) => {
+
+        const image =
+            new Image();
+
+        image.onload = () =>
+            resolve(image);
+
+        image.onerror =
+            reject;
+
+        image.src =
+            URL.createObjectURL(file);
+
+    });
+
+}
+
+/*
+==================================================
+قراءة MRZ
+==================================================
+*/
+
+async function readMRZ(file) {
+
+    const canvas =
+        await prepareImage(file);
+
+    const result =
+        await Tesseract.recognize(
+            canvas,
+            "eng",
+            {
+                logger: function(info) {
+
+                    if (
+                        info.status ===
+                        "recognizing text"
+                    ) {
+                        // التقدم الداخلي
+                    }
+
+                }
+            }
+        );
+
+    const rawText =
+        result.data.text;
+
+    return extractMRZ(rawText);
+}
+
+/*
+==================================================
+العثور على سطرَي MRZ
+==================================================
+*/
+
+function extractMRZ(text) {
+
+    let lines =
+        text
+        .toUpperCase()
+        .split(/\r?\n/)
+        .map(line =>
+            line
+            .replace(/\s/g, "")
+            .replace(/«/g, "<")
+            .replace(/</g, "<")
+            .trim()
+        )
+        .filter(line => line.length > 10);
+
+    /*
+    نبحث عن السطر الذي يبدأ بـ P<
+    */
+
+    let firstIndex =
+        lines.findIndex(line =>
+            line.startsWith("P<") ||
+            line.startsWith("P")
+        );
+
+    if (firstIndex === -1) {
+
+        /*
+        إذا لم يجد P<
+        نبحث عن أقرب سطر طويل يحتوي < و IRQ
+        */
+
+        firstIndex =
+            lines.findIndex(line =>
+                line.includes("IRQ") &&
+                line.includes("<") &&
+                line.length >= 25
+            );
+    }
+
+    if (firstIndex === -1) {
+
+        return {
+            success: false,
+            raw: text,
+            mrz: [],
+            data: {}
+        };
+
+    }
+
+    let line1 =
+        cleanMRZLine(lines[firstIndex]);
+
+    let line2 = "";
+
+    /*
+    السطر التالي هو غالباً السطر الثاني
+    */
+
+    for (
+        let i = firstIndex + 1;
+        i < lines.length;
+        i++
+    ) {
+
+        const candidate =
+            cleanMRZLine(lines[i]);
+
+        if (
+            candidate.length >= 20 &&
+            (
+                /\d/.test(candidate) ||
+                candidate.includes("IRQ")
+            )
+        ) {
+
+            line2 = candidate;
+
+            break;
+        }
+
+    }
+
+    /*
+    محاولة إصلاح أطوال السطور
+    */
+
+    line1 =
+        normalizeMRZLine1(line1);
+
+    line2 =
+        normalizeMRZLine2(line2);
+
+    const parsed =
+        parseTD3(line1, line2);
+
+    return {
+        success: parsed.success,
+        raw: text,
+        mrz: [
+            line1,
+            line2
+        ],
+        data: parsed.data,
+        warning: parsed.warning
+    };
+
+}
+
+/*
+==================================================
+تنظيف MRZ
+==================================================
+*/
+
+function cleanMRZLine(line) {
+
+    line =
+        line
+        .toUpperCase()
+        .replace(/[^A-Z0-9<]/g, "");
+
+    /*
+    OCR أحياناً يقرأ O مكان 0
+    أو I مكان 1.
+
+    لا نصلحها هنا بشكل شامل لأن الحرف قد يكون
+    صحيحاً. التصحيح يتم حسب موقع الحقل.
+    */
+
+    return line;
+
+}
+
+function normalizeMRZLine1(line) {
+
+    /*
+    جواز TD3 يجب أن يكون 44 خانة.
+    */
+
+    if (line.length > 44) {
+
+        line =
+            line.substring(0, 44);
+
+    }
+
+    return line;
+
+}
+
+function normalizeMRZLine2(line) {
+
+    if (line.length > 44) {
+
+        line =
+            line.substring(0, 44);
+
+    }
+
+    return line;
+
+}
+
+/*
+==================================================
+تحليل جواز TD3
+==================================================
+*/
+
+function parseTD3(line1, line2) {
+
+    if (
+        !line1 ||
+        !line2
+    ) {
+
+        return {
+            success: false,
+            data: {},
+            warning:
+                "لم يتم العثور على سطرَي MRZ بشكل واضح."
+        };
+
+    }
+
+    /*
+    السطر الأول:
+
+    0       Document Type
+    2-4     Issuing State
+    5-43    Name
+    */
+
+    let documentType =
+        line1.substring(0, 2);
+
+    let issuingState =
+        line1.substring(2, 5);
+
+    let namePart =
+        line1.substring(5);
+
+    /*
+    السطر الثاني:
+
+    0-8     Passport Number
+    9       Check Digit
+    10-12   Nationality
+    13-18   Date of Birth
+    19      Check Digit
+    20      Sex
+    21-26   Expiry Date
+    27      Check Digit
+    28-42   Personal Number
+    43      Check Digit
+    */
+
+    let passportNumber =
+        fixPassportNumber(
+            line2.substring(0, 9)
+        );
+
+    let nationality =
+        line2.substring(10, 13);
+
+    let birthDate =
+        line2.substring(13, 19);
+
+    let sex =
+        line2.substring(20, 21);
+
+    let expiryDate =
+        line2.substring(21, 27);
+
+    let personalNumber =
+        line2.substring(28, 42);
+
+    /*
+    الاسم
+    */
+
+    let nameParts =
+        namePart.split("<<");
+
+    let surname =
+        (nameParts[0] || "")
+        .replace(/</g, " ")
+        .trim();
+
+    let givenNames =
+        (nameParts[1] || "")
+        .replace(/</g, " ")
+        .trim();
+
+    /*
+    إذا لم تكن هناك << بسبب OCR
+    */
+
+    if (!givenNames) {
+
+        let fallback =
+            namePart
+            .replace(/<+/g, " ")
+            .trim();
+
+        let parts =
+            fallback.split(/\s+/);
+
+        surname =
+            parts.shift() || "";
+
+        givenNames =
+            parts.join(" ");
+
+    }
+
+    let fullName =
+        (
+            surname +
+            " " +
+            givenNames
+        )
+        .replace(/\s+/g, " ")
+        .trim();
+
+    /*
+    التواريخ
+    */
+
+    const formattedBirth =
+        formatMRZDate(birthDate);
+
+    const formattedExpiry =
+        formatMRZDate(expiryDate);
+
+    /*
+    الجنس
+    */
+
+    let gender =
+        sex === "M"
+            ? "ذكر"
+            : sex === "F"
+                ? "أنثى"
+                : sex || "غير واضح";
+
+    /*
+    التحقق من بعض الحقول
+    */
+
+    let warning = [];
+
+    if (line1.length !== 44) {
+        warning.push(
+            "السطر الأول ليس بطول MRZ القياسي."
+        );
+    }
+
+    if (line2.length !== 44) {
+        warning.push(
+            "السطر الثاني ليس بطول MRZ القياسي."
+        );
+    }
+
+    if (
+        !/^[A-Z]{3}$/.test(nationality)
+    ) {
+        warning.push(
+            "الجنسية تحتاج إلى مراجعة."
+        );
+    }
+
+    if (
+        !/^\d{6}$/.test(birthDate)
+    ) {
+        warning.push(
+            "تاريخ الميلاد يحتاج إلى مراجعة."
+        );
+    }
+
+    if (
+        !/^\d{6}$/.test(expiryDate)
+    ) {
+        warning.push(
+            "تاريخ الانتهاء يحتاج إلى مراجعة."
+        );
+    }
+
+    return {
+
+        success: true,
+
+        data: {
+
+            documentType:
+                documentType,
+
+            issuingState:
+                issuingState,
+
+            surname:
+                surname,
+
+            givenNames:
+                givenNames,
+
+            fullName:
+                fullName,
+
+            passportNumber:
+                passportNumber,
+
+            nationality:
+                nationality,
+
+            birthDate:
+                formattedBirth,
+
+            sex:
+                gender,
+
+            expiryDate:
+                formattedExpiry,
+
+            personalNumber:
+                personalNumber
+
+        },
+
+        warning:
+            warning.join(" ")
+
+    };
+
+}
+
+/*
+==================================================
+تصحيح رقم الجواز
+==================================================
+*/
+
+function fixPassportNumber(value) {
+
+    /*
+    رقم الجواز غالباً 9 خانات.
+
+    نحاول فقط تنظيف الرموز.
+    */
+
+    return value
+        .replace(/O/g, "0")
+        .replace(/I/g, "1")
+        .replace(/L/g, "1");
+
+}
+
+/*
+==================================================
+تحويل تاريخ MRZ
+YYMMDD
+==================================================
+*/
+
+function formatMRZDate(value) {
+
+    if (
+        !/^\d{6}$/.test(value)
+    ) {
+        return value || "غير واضح";
+    }
+
+    const yy =
+        parseInt(
+            value.substring(0,2)
+        );
+
+    const mm =
+        value.substring(2,4);
+
+    const dd =
+        value.substring(4,6);
+
+    /*
+    نستخدم 1950 كحد فاصل تقريبي
+    */
+
+    const year =
+        yy >= 50
+            ? 1900 + yy
+            : 2000 + yy;
+
+    return (
+        dd +
+        "/" +
+        mm +
+        "/" +
+        year
+    );
+
+}
+
+/*
+==================================================
+معالجة جميع الصور
+==================================================
+*/
+
 async function startProcessing() {
 
-    if (selectedFiles.length === 0) {
+    if (
+        selectedFiles.length === 0
+    ) {
         return;
     }
 
     startButton.disabled = true;
 
-    extractedTexts = [];
+    copyAllButton.disabled = true;
 
-    const results = document.getElementById("results");
+    extractedResults = [];
 
-    results.innerHTML = "";
+    document.getElementById("results").innerHTML = "";
 
-    document.getElementById("progress").style.display = "block";
+    document.getElementById("progress").style.display =
+        "block";
 
-    document.getElementById("status").style.display = "block";
+    document.getElementById("status").style.display =
+        "block";
 
-    for (let i = 0; i < selectedFiles.length; i++) {
+    for (
+        let i = 0;
+        i < selectedFiles.length;
+        i++
+    ) {
 
-        const file = selectedFiles[i];
+        const file =
+            selectedFiles[i];
 
         document.getElementById("status").textContent =
-            "جاري قراءة الجواز " +
+            "جاري قراءة MRZ للجواز " +
             (i + 1) +
             " من " +
             selectedFiles.length;
 
-        const percentage =
-            Math.round((i / selectedFiles.length) * 100);
-
-        document.getElementById("progressBar").style.width =
-            percentage + "%";
-
         try {
 
             const result =
-                await Tesseract.recognize(
-                    file,
-                    "eng",
-                    {
-                        logger: info => {
+                await readMRZ(file);
 
-                            if (
-                                info.status === "recognizing text"
-                                &&
-                                typeof info.progress === "number"
-                            ) {
-
-                                const localProgress =
-                                    info.progress * 100;
-
-                                const totalProgress =
-                                    ((i + localProgress / 100)
-                                    / selectedFiles.length) * 100;
-
-                                document.getElementById(
-                                    "progressBar"
-                                ).style.width =
-                                    totalProgress + "%";
-                            }
-
-                        }
-                    }
-                );
-
-            const text = result.data.text.trim();
-
-            extractedTexts.push(text);
+            extractedResults.push(result);
 
             addResult(
                 i + 1,
                 file.name,
-                text
+                result
             );
-
-            document.getElementById("processedCount").textContent =
-                i + 1;
 
         } catch (error) {
 
-            extractedTexts.push("");
+            const failed =
+                {
+                    success: false,
+                    data: {},
+                    mrz: [],
+                    raw: "",
+                    warning:
+                        "حدث خطأ أثناء قراءة الصورة."
+                };
+
+            extractedResults.push(failed);
 
             addResult(
                 i + 1,
                 file.name,
-                "تعذر قراءة هذه الصورة."
+                failed
             );
 
         }
 
+        document.getElementById("processedCount").textContent =
+            i + 1;
+
+        const percentage =
+            Math.round(
+                ((i + 1) /
+                selectedFiles.length) *
+                100
+            );
+
+        document.getElementById("progressBar").style.width =
+            percentage + "%";
+
     }
 
-    document.getElementById("progressBar").style.width = "100%";
-
     document.getElementById("status").textContent =
-        "✅ اكتملت معالجة جميع الصور";
-
-    copyAllButton.disabled =
-        extractedTexts.length === 0;
+        "✅ اكتملت قراءة جميع الجوازات";
 
     startButton.disabled = false;
 
+    copyAllButton.disabled =
+        extractedResults.length === 0;
+
 }
 
-function addResult(index, fileName, text) {
+/*
+==================================================
+عرض النتيجة
+==================================================
+*/
+
+function addResult(
+    index,
+    fileName,
+    result
+) {
 
     const results =
         document.getElementById("results");
@@ -509,7 +1193,43 @@ function addResult(index, fileName, text) {
     const card =
         document.createElement("div");
 
-    card.className = "result-card";
+    card.className =
+        "result-card";
+
+    if (
+        !result.success
+    ) {
+
+        card.innerHTML = `
+
+            <div class="result-header">
+
+                <div class="result-title">
+                    جواز رقم ${index}
+                    <br>
+                    <small>
+                        ${escapeHtml(fileName)}
+                    </small>
+                </div>
+
+            </div>
+
+            <div class="warning error">
+                ⚠️ ${escapeHtml(
+                    result.warning ||
+                    "تعذر استخراج بيانات MRZ."
+                )}
+            </div>
+
+        `;
+
+        results.appendChild(card);
+
+        return;
+    }
+
+    const d =
+        result.data;
 
     card.innerHTML = `
 
@@ -518,17 +1238,95 @@ function addResult(index, fileName, text) {
             <div class="result-title">
                 جواز رقم ${index}
                 <br>
-                <small>${escapeHtml(fileName)}</small>
+                <small>
+                    ${escapeHtml(fileName)}
+                </small>
             </div>
 
-            <button class="copy"
-                    onclick="copySpecific(this)">
+            <button
+                class="copy"
+                onclick="copyCard(this)"
+            >
                 📋 نسخ
             </button>
 
         </div>
 
-        <textarea class="result-text">${escapeHtml(text)}</textarea>
+        <div class="data-grid">
+
+            ${dataBox(
+                "الاسم الكامل",
+                d.fullName
+            )}
+
+            ${dataBox(
+                "اسم العائلة",
+                d.surname
+            )}
+
+            ${dataBox(
+                "الأسماء",
+                d.givenNames
+            )}
+
+            ${dataBox(
+                "رقم الجواز",
+                d.passportNumber
+            )}
+
+            ${dataBox(
+                "الجنسية",
+                d.nationality
+            )}
+
+            ${dataBox(
+                "تاريخ الميلاد",
+                d.birthDate
+            )}
+
+            ${dataBox(
+                "الجنس",
+                d.sex
+            )}
+
+            ${dataBox(
+                "تاريخ الانتهاء",
+                d.expiryDate
+            )}
+
+            ${dataBox(
+                "الدولة المصدرة",
+                d.issuingState
+            )}
+
+        </div>
+
+        <div class="mrz-box">
+
+            <div class="data-label">
+                MRZ المقروءة
+            </div>
+
+            <textarea
+                class="mrz-text"
+                readonly
+            >${escapeHtml(
+                result.mrz.join("\n")
+            )}</textarea>
+
+        </div>
+
+        ${
+            result.warning
+                ? `
+                <div class="warning">
+                    ⚠️ ${escapeHtml(
+                        result.warning
+                    )}
+                </div>
+                `
+                : ""
+        }
 
     `;
 
@@ -536,104 +1334,336 @@ function addResult(index, fileName, text) {
 
 }
 
-function copySpecific(button) {
+/*
+==================================================
+صندوق بيانات
+==================================================
+*/
 
-    const textarea =
-        button.parentElement
-        .parentElement
-        .querySelector(".result-text");
+function dataBox(
+    label,
+    value
+) {
 
-    copyText(textarea.value);
+    return `
+
+        <div class="data-box">
+
+            <div class="data-label">
+                ${label}
+            </div>
+
+            <div class="data-value">
+                ${escapeHtml(
+                    value ||
+                    "غير واضح"
+                )}
+            </div>
+
+        </div>
+
+    `;
 
 }
 
+/*
+==================================================
+نسخ جواز واحد
+==================================================
+*/
+
+function copyCard(button) {
+
+    const card =
+        button.closest(
+            ".result-card"
+        );
+
+    const boxes =
+        card.querySelectorAll(
+            ".data-box"
+        );
+
+    let text = "";
+
+    boxes.forEach(box => {
+
+        const label =
+            box.querySelector(
+                ".data-label"
+            ).textContent.trim();
+
+        const value =
+            box.querySelector(
+                ".data-value"
+            ).textContent.trim();
+
+        text +=
+            label +
+            ": " +
+            value +
+            "\n";
+
+    });
+
+    copyText(text);
+
+}
+
+/*
+==================================================
+نسخ كل الجوازات
+==================================================
+*/
+
 function copyAll() {
 
-    const textareas =
-        document.querySelectorAll(".result-text");
+    if (
+        extractedResults.length === 0
+    ) {
 
-    if (textareas.length === 0) {
-
-        showToast("لا توجد بيانات للنسخ");
+        showToast(
+            "لا توجد بيانات للنسخ"
+        );
 
         return;
     }
 
-    let allText = "";
+    let text = "";
 
-    textareas.forEach((textarea, index) => {
+    extractedResults.forEach(
+        (result, index) => {
 
-        allText +=
-            "====================\n";
+            text +=
+                "==============================\n";
 
-        allText +=
-            "جواز رقم " +
-            (index + 1) +
-            "\n";
+            text +=
+                "جواز رقم " +
+                (index + 1) +
+                "\n";
 
-        allText +=
-            "====================\n";
+            text +=
+                "==============================\n";
 
-        allText +=
-            textarea.value.trim() +
-            "\n\n";
+            if (
+                result.success
+            ) {
 
-    });
+                const d =
+                    result.data;
 
-    copyText(allText);
+                text +=
+                    "الاسم الكامل: " +
+                    d.fullName +
+                    "\n";
+
+                text +=
+                    "اسم العائلة: " +
+                    d.surname +
+                    "\n";
+
+                text +=
+                    "الأسماء: " +
+                    d.givenNames +
+                    "\n";
+
+                text +=
+                    "رقم الجواز: " +
+                    d.passportNumber +
+                    "\n";
+
+                text +=
+                    "الجنسية: " +
+                    d.nationality +
+                    "\n";
+
+                text +=
+                    "تاريخ الميلاد: " +
+                    d.birthDate +
+                    "\n";
+
+                text +=
+                    "الجنس: " +
+                    d.sex +
+                    "\n";
+
+                text +=
+                    "تاريخ الانتهاء: " +
+                    d.expiryDate +
+                    "\n";
+
+                text +=
+                    "الدولة المصدرة: " +
+                    d.issuingState +
+                    "\n";
+
+            } else {
+
+                text +=
+                    "تعذر استخراج البيانات\n";
+
+            }
+
+            text += "\n";
+
+        }
+    );
+
+    copyText(text);
 
 }
 
+/*
+==================================================
+مسح كل شيء
+==================================================
+*/
+
+function clearAll() {
+
+    selectedFiles = [];
+
+    extractedResults = [];
+
+    fileInput.value = "";
+
+    document.getElementById(
+        "results"
+    ).innerHTML = "";
+
+    document.getElementById(
+        "fileCount"
+    ).textContent = "0";
+
+    document.getElementById(
+        "processedCount"
+    ).textContent = "0";
+
+    document.getElementById(
+        "progressBar"
+    ).style.width = "0%";
+
+    document.getElementById(
+        "status"
+    ).style.display = "none";
+
+    document.getElementById(
+        "progress"
+    ).style.display = "none";
+
+    startButton.disabled = true;
+
+    copyAllButton.disabled = true;
+
+}
+
+/*
+==================================================
+نسخ
+==================================================
+*/
+
 function copyText(text) {
 
-    navigator.clipboard.writeText(text)
-        .then(() => showToast())
+    navigator.clipboard
+        .writeText(text)
+        .then(() => {
+
+            showToast(
+                "تم النسخ بنجاح ✓"
+            );
+
+        })
         .catch(() => {
 
             const textarea =
-                document.createElement("textarea");
+                document.createElement(
+                    "textarea"
+                );
 
             textarea.value = text;
 
-            document.body.appendChild(textarea);
+            document.body.appendChild(
+                textarea
+            );
 
             textarea.select();
 
-            document.execCommand("copy");
+            document.execCommand(
+                "copy"
+            );
 
             textarea.remove();
 
-            showToast();
+            showToast(
+                "تم النسخ بنجاح ✓"
+            );
 
         });
 
 }
 
-function showToast(message = "تم النسخ بنجاح ✓") {
+/*
+==================================================
+Toast
+==================================================
+*/
+
+function showToast(
+    message
+) {
 
     const toast =
-        document.getElementById("toast");
+        document.getElementById(
+            "toast"
+        );
 
-    toast.textContent = message;
+    toast.textContent =
+        message;
 
-    toast.classList.add("show");
+    toast.classList.add(
+        "show"
+    );
 
     setTimeout(() => {
 
-        toast.classList.remove("show");
+        toast.classList.remove(
+            "show"
+        );
 
     }, 1800);
 
 }
 
+/*
+==================================================
+حماية النص
+==================================================
+*/
+
 function escapeHtml(text) {
 
-    return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+    return String(text || "")
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
 
 }
 
